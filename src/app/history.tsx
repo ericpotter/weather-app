@@ -6,6 +6,7 @@ import * as Sharing from 'expo-sharing';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { DBService, WeatherRecord } from '../services/dbService';
+import { auth } from '../services/firebaseConfig';
 
 export default function HistoryScreen() {
     const [records, setRecords] = useState<WeatherRecord[]>([]);
@@ -14,9 +15,14 @@ export default function HistoryScreen() {
     const [editNote, setEditNote] = useState('');
 
     const loadData = async () => {
+        const uid = auth.currentUser?.uid;
+        if (!uid) {
+            setLoading(false);
+            return;
+        }
         setLoading(true);
         try {
-            const data = await DBService.getAllQueries();
+            const data = await DBService.getAllQueries(uid);
             setRecords(data);
         } catch (error) {
             Alert.alert('Error', 'Failed to load history data');

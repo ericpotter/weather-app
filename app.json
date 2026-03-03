@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "weather-app",
+    "name": "Weather",
     "slug": "weather-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -24,11 +24,30 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "shortName": "Weather",
+      "name": "Weather",
+      "description": "Real-time weather app by Tsung-Yueh (Eric) Lai",
+      "themeColor": "#0F2027",
+      "backgroundColor": "#0F2027",
+      "display": "standalone",
+      "orientation": "portrait",
+      "baseUrl": "/weather-app"
     },
     "plugins": [
       "expo-sharing",
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "a2c34ec1-887c-4a0a-a67a-998b4bf6e877"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/a2c34ec1-887c-4a0a-a67a-998b4bf6e877"
+    }
   }
 }

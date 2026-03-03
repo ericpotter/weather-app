@@ -1,8 +1,9 @@
-import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
+import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, where } from 'firebase/firestore';
 import { db } from './firebaseConfig';
 
 export interface WeatherRecord {
     id?: string;
+    uid: string;
     locationName: string;
     temperature: number;
     condition: string;
@@ -28,9 +29,9 @@ export const DBService = {
     },
 
     // READ
-    async getAllQueries(): Promise<WeatherRecord[]> {
+    async getAllQueries(uid: string): Promise<WeatherRecord[]> {
         try {
-            const q = query(collection(db, COLLECTION_NAME), orderBy('createdAt', 'desc'));
+            const q = query(collection(db, COLLECTION_NAME), where('uid', '==', uid), orderBy('createdAt', 'desc'));
             const querySnapshot = await getDocs(q);
             const records: WeatherRecord[] = [];
             querySnapshot.forEach((doc) => {

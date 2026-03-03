@@ -1,36 +1,45 @@
 import { useState } from 'react';
 import * as Location from 'expo-location';
-import axios from 'axios';
 import { WeatherService } from '../services/weatherService';
 import { WeatherData } from '../interfaces/Weather';
 
 export function useWeather() {
     const [data, setData] = useState<WeatherData | null>(null);
-    const [locationInfo, setLocationInfo] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const [locationOptions, setLocationOptions] = useState<import('../interfaces/Weather').Location[] | null>(null);
 
-    const fetchWikiInfo = async (locationName: string) => {
+const fetchWeatherByQuery = async (query: string) => {
+        setLoading(true);
+        setError(null);
+        setLocationOptions(null);
         try {
-            const response = await axios.get(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(locationName)}`);
-            if (response.data && response.data.extract) {
-                setLocationInfo(response.data.extract);
-            } else {
-                setLocationInfo(null);
+            const locations = await WeatherService.searchLocations(query);
+            if (locations.length === 0) {
+                setError('Location not found.');
+                return;
             }
-        } catch (e) {
-            setLocationInfo(null); // Just ignore if Wikipedia doesn't have it
+            if (locations.length > 1) {
+                setLocationOptions(locations);
+                setLoading(false);
+                return;
+            }
+            const result = await WeatherService.getWeather(locations[0].latitude, locations[0].longitude, locations[0]);
+            setData(result);
+        } catch (err: any) {
+            setError(err.message || 'Failed to fetch weather data.');
+        } finally {
+            setLoading(false);
         }
     };
 
-    const fetchWeatherByQuery = async (query: string) => {
+    const selectLocation = async (location: import('../interfaces/Weather').Location) => {
+        setLocationOptions(null);
         setLoading(true);
         setError(null);
-        setLocationInfo(null);
         try {
-            const result = await WeatherService.getWeatherByQuery(query);
+            const result = await WeatherService.getWeather(location.latitude, location.longitude, location);
             setData(result);
-            fetchWikiInfo(result.location.name);
         } catch (err: any) {
             setError(err.message || 'Failed to fetch weather data.');
         } finally {
@@ -72,7 +81,6 @@ export function useWeather() {
             });
 
             setData(result);
-            fetchWikiInfo(locationName);
         } catch (err: any) {
             setError(err.message || 'Failed to fetch current location weather.');
         } finally {
@@ -82,10 +90,11 @@ export function useWeather() {
 
     return {
         data,
-        locationInfo,
         loading,
         error,
+        locationOptions,
         fetchWeatherByQuery,
+        selectLocation,
         fetchWeatherByCurrentLocation,
     };
 }

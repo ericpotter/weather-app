@@ -12,6 +12,14 @@ export interface CurrentWeather {
     windSpeed: number;
     weatherCode: number;
     time: string;
+    feelsLike: number;
+    windGusts: number;
+    windDirection: number;
+    uvIndex: number;
+    visibility: number;
+    pressure: number;
+    cloudCover: number;
+    precipitation: number;
 }
 
 export interface DailyForecast {
@@ -19,6 +27,14 @@ export interface DailyForecast {
     maxTemp: number;
     minTemp: number;
     weatherCode: number;
+    precipitationSum: number;
+    precipitationProbability: number;
+    windSpeedMax: number;
+    windGustsMax: number;
+    windDirection: number;
+    uvIndexMax: number;
+    sunrise: string;
+    sunset: string;
 }
 
 export interface WeatherData {

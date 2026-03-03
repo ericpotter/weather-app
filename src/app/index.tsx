@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, Text, TouchableOpacity, Alert, StatusBar } from 'react-native';
+import { View, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, Text, TouchableOpacity, Alert, StatusBar, Modal, Linking } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useWeather } from '../hooks/useWeather';
@@ -7,10 +7,27 @@ import SearchBar from '../components/specific/SearchBar';
 import WeatherCard from '../components/specific/WeatherCard';
 import ForecastList from '../components/specific/ForecastList';
 import { DBService } from '../services/dbService';
+import { auth } from '../services/firebaseConfig';
 import HistoryScreen from './history';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
+import WeatherEffects from '../components/specific/WeatherEffects';
+import WeatherDetails from '../components/specific/WeatherDetails';
+
+function getWeatherGradient(weatherCode: number | undefined): [string, string, string] {
+    if (weatherCode === undefined) return ['#0F2027', '#203A43', '#2C5364'];
+    if (weatherCode === 0) return ['#1A6B9A', '#2E86C1', '#85C1E9'];           // Clear sky — bright blue
+    if (weatherCode <= 2) return ['#2874A6', '#5DADE2', '#AED6F1'];            // Mainly clear — light blue
+    if (weatherCode === 3) return ['#566573', '#717D7E', '#99A3A4'];           // Overcast — gray
+    if (weatherCode <= 48) return ['#626567', '#797D7F', '#AAB7B8'];           // Fog — muted gray
+    if (weatherCode <= 55) return ['#1B4F72', '#2E86C1', '#7FB3D3'];           // Drizzle — steel blue
+    if (weatherCode <= 65) return ['#154360', '#1A5276', '#2471A3'];           // Rain — dark blue
+    if (weatherCode <= 77) return ['#1a2a3a', '#2d4a6b', '#4a7a9b'];           // Snow — dark wintry blue
+    if (weatherCode <= 82) return ['#1B2631', '#1F618D', '#2874A6'];           // Rain showers — deep blue
+    if (weatherCode === 85 || weatherCode === 86) return ['#1a2a3a', '#2d4a6b', '#4a7a9b']; // Snow showers
+    return ['#17202A', '#1C2833', '#273746'];                                   // Thunderstorm — near black
+}
 
 export type RootStackParamList = {
     Home: undefined;
@@ -24,18 +41,27 @@ interface Props {
 }
 
 function HomeScreen({ navigation }: Props) {
-    const { data, locationInfo, loading, error, fetchWeatherByQuery, fetchWeatherByCurrentLocation } = useWeather();
+    const { data, loading, error, locationOptions, fetchWeatherByQuery, selectLocation, fetchWeatherByCurrentLocation } = useWeather();
     const [saving, setSaving] = useState(false);
+    const [showAbout, setShowAbout] = useState(false);
 
     useEffect(() => {
-        // Wait for user action
+        const cities = ['Tokyo', 'New York', 'Paris', 'Sydney', 'Dubai', 'London', 'São Paulo', 'Cairo', 'Toronto', 'Seoul'];
+        const randomCity = cities[Math.floor(Math.random() * cities.length)];
+        fetchWeatherByQuery(randomCity);
     }, []);
 
     const handleSaveToHistory = async () => {
         if (!data) return;
+        const uid = auth.currentUser?.uid;
+        if (!uid) {
+            Alert.alert('Error', 'Not signed in. Please wait a moment and try again.');
+            return;
+        }
         setSaving(true);
         try {
             await DBService.saveWeatherQuery({
+                uid,
                 locationName: data.location.name,
                 temperature: data.current.temperature,
                 condition: data.current.weatherCode.toString(),
@@ -51,29 +77,80 @@ function HomeScreen({ navigation }: Props) {
 
     return (
         <LinearGradient
-            colors={['#0F2027', '#203A43', '#2C5364']} // Deep atmospheric gradient
+            colors={getWeatherGradient(data?.current.weatherCode)}
             style={styles.container}
         >
+            <WeatherEffects key={data?.current.weatherCode} weatherCode={data?.current.weatherCode} />
             <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
             <SafeAreaView style={styles.safeArea}>
                 <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                     <View style={styles.header}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                             <MaterialCommunityIcons name="weather-partly-cloudy" size={28} color="#FFFFFF" />
-                            <Text style={styles.logo}>PM Accelerator</Text>
+                            <Text style={styles.logo}>Weather</Text>
                         </View>
-                        <TouchableOpacity onPress={() => navigation.navigate('History')} style={styles.historyBtn}>
-                            <BlurView intensity={30} tint="light" style={styles.historyGlass}>
-                                <MaterialCommunityIcons name="history" size={24} color="#FFFFFF" />
-                            </BlurView>
-                        </TouchableOpacity>
+                        <View style={{ flexDirection: 'row', gap: 10 }}>
+                            <TouchableOpacity onPress={() => setShowAbout(true)} style={styles.historyBtn}>
+                                <BlurView intensity={30} tint="light" style={styles.historyGlass}>
+                                    <MaterialCommunityIcons name="information-outline" size={24} color="#FFFFFF" />
+                                </BlurView>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => navigation.navigate('History')} style={styles.historyBtn}>
+                                <BlurView intensity={30} tint="light" style={styles.historyGlass}>
+                                    <MaterialCommunityIcons name="history" size={24} color="#FFFFFF" />
+                                </BlurView>
+                            </TouchableOpacity>
+                        </View>
                     </View>
+
+                    <Modal visible={showAbout} transparent animationType="fade" onRequestClose={() => setShowAbout(false)}>
+                        <View style={styles.modalOverlay}>
+                            <BlurView intensity={60} tint="dark" style={styles.modalCard}>
+                                <MaterialCommunityIcons name="weather-partly-cloudy" size={40} color="#FFFFFF" style={{ marginBottom: 8 }} />
+                                <Text style={styles.modalTitle}>Weather</Text>
+                                <Text style={styles.modalSubtitle}>Built by Tsung-Yueh (Eric) Lai</Text>
+
+                                <View style={styles.modalDivider} />
+
+                                <Text style={styles.modalSectionTitle}>About PM Accelerator</Text>
+                                <Text style={styles.modalBody}>
+                                    Product Manager Accelerator is the fastest-growing Product Management professional development company in the industry. Led by Dr. Nancy Li, PM Accelerator boasts the most engaging alumni network, the highest success rate in landing top-tier PM offers, and is top-rated in the product management education space.{'\n\n'}PM Accelerator also provides seed investment to selected teams building high-impact products, helping them scale or apply to Y Combinator, and created the AI PM Bootcamp to help professionals become the next generation of AI Product Leaders.
+                                </Text>
+
+                                <TouchableOpacity
+                                    style={styles.linkedInBtn}
+                                    onPress={() => Linking.openURL('https://www.linkedin.com/school/pmaccelerator/')}
+                                >
+                                    <MaterialCommunityIcons name="linkedin" size={18} color="#FFFFFF" />
+                                    <Text style={styles.linkedInBtnText}>View on LinkedIn</Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity onPress={() => setShowAbout(false)} style={styles.modalClose}>
+                                    <Text style={styles.modalCloseText}>Close</Text>
+                                </TouchableOpacity>
+                            </BlurView>
+                        </View>
+                    </Modal>
 
                     <SearchBar
                         onSearch={fetchWeatherByQuery}
                         onLocationSearch={fetchWeatherByCurrentLocation}
                         loading={loading}
                     />
+
+                    {locationOptions && (
+                        <BlurView intensity={30} tint="dark" style={styles.pickerContainer}>
+                            <Text style={styles.pickerTitle}>Select a location:</Text>
+                            {locationOptions.map((loc, i) => (
+                                <TouchableOpacity key={i} style={styles.pickerItem} onPress={() => selectLocation(loc)}>
+                                    <MaterialCommunityIcons name="map-marker-outline" size={18} color="rgba(255,255,255,0.7)" />
+                                    <Text style={styles.pickerText}>
+                                        {loc.name}{loc.admin1 ? `, ${loc.admin1}` : ''}{loc.country ? `, ${loc.country}` : ''}
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
+                        </BlurView>
+                    )}
 
                     {loading && (
                         <View style={styles.centerContainer}>
@@ -92,14 +169,7 @@ function HomeScreen({ navigation }: Props) {
                     {data && !loading && !error && (
                         <View style={styles.resultsContainer}>
                             <WeatherCard current={data.current} location={data.location} />
-
-                            {locationInfo && (
-                                <BlurView intensity={20} tint="light" style={styles.wikiContainer}>
-                                    <MaterialCommunityIcons name="wikipedia" size={24} color="rgba(255,255,255,0.8)" style={{ marginTop: 2 }} />
-                                    <Text style={styles.wikiText} numberOfLines={5}>{locationInfo}</Text>
-                                </BlurView>
-                            )}
-
+                            <WeatherDetails current={data.current} />
                             <ForecastList forecast={data.daily} />
 
                             <TouchableOpacity
@@ -123,7 +193,7 @@ function HomeScreen({ navigation }: Props) {
 
                             <View style={styles.pmAcceleratorNote}>
                                 <Text style={styles.pmAcceleratorNoteText}>
-                                    PM Accelerator is a premier product management coaching program helping tech professionals land PM offers.
+                                    Weather — Built by Tsung-Yueh (Eric) Lai
                                 </Text>
                             </View>
                         </View>
@@ -198,28 +268,40 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         lineHeight: 22,
     },
-    resultsContainer: {
-        marginTop: 8,
-    },
-    wikiContainer: {
+    pickerContainer: {
         marginHorizontal: 20,
-        padding: 20,
-        borderRadius: 24,
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        gap: 16,
-        marginBottom: 8,
+        borderRadius: 16,
         overflow: 'hidden',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.15)',
-        backgroundColor: 'rgba(255,255,255,0.05)',
+        marginBottom: 8,
     },
-    wikiText: {
-        flex: 1,
-        color: 'rgba(255,255,255,0.9)',
-        fontSize: 14,
-        lineHeight: 24,
-        fontWeight: '400',
+    pickerTitle: {
+        color: 'rgba(255,255,255,0.5)',
+        fontSize: 12,
+        fontWeight: '600',
+        letterSpacing: 0.5,
+        paddingHorizontal: 16,
+        paddingTop: 14,
+        paddingBottom: 6,
+        textTransform: 'uppercase',
+    },
+    pickerItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        paddingHorizontal: 16,
+        paddingVertical: 14,
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(255,255,255,0.08)',
+    },
+    pickerText: {
+        color: '#FFFFFF',
+        fontSize: 15,
+        fontWeight: '500',
+    },
+    resultsContainer: {
+        marginTop: 8,
     },
     saveBtnWrapper: {
         marginHorizontal: 20,
@@ -242,6 +324,79 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         letterSpacing: 0.5,
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 24,
+    },
+    modalCard: {
+        width: '100%',
+        borderRadius: 28,
+        overflow: 'hidden',
+        padding: 28,
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.15)',
+    },
+    modalTitle: {
+        fontSize: 26,
+        fontWeight: '800',
+        color: '#FFFFFF',
+        letterSpacing: 0.5,
+    },
+    modalSubtitle: {
+        fontSize: 14,
+        color: 'rgba(255,255,255,0.5)',
+        marginTop: 4,
+        marginBottom: 4,
+    },
+    modalDivider: {
+        width: '100%',
+        height: 1,
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        marginVertical: 20,
+    },
+    modalSectionTitle: {
+        fontSize: 13,
+        fontWeight: '700',
+        color: 'rgba(255,255,255,0.5)',
+        letterSpacing: 1,
+        textTransform: 'uppercase',
+        alignSelf: 'flex-start',
+        marginBottom: 10,
+    },
+    modalBody: {
+        fontSize: 14,
+        color: 'rgba(255,255,255,0.8)',
+        lineHeight: 22,
+        textAlign: 'left',
+        alignSelf: 'flex-start',
+    },
+    linkedInBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        marginTop: 20,
+        backgroundColor: '#0A66C2',
+        paddingHorizontal: 20,
+        paddingVertical: 12,
+        borderRadius: 24,
+    },
+    linkedInBtnText: {
+        color: '#FFFFFF',
+        fontWeight: '600',
+        fontSize: 14,
+    },
+    modalClose: {
+        marginTop: 16,
+        padding: 10,
+    },
+    modalCloseText: {
+        color: 'rgba(255,255,255,0.4)',
+        fontSize: 14,
     },
     pmAcceleratorNote: {
         marginHorizontal: 20,
@@ -275,7 +430,7 @@ export default function RootApp() {
                     name="History"
                     component={HistoryScreen}
                     options={{
-                        title: 'Logs',
+                        title: 'History',
                         headerStyle: { backgroundColor: '#0F2027' },
                         headerTintColor: '#FFFFFF',
                         headerShadowVisible: false,
