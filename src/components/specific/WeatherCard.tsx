@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { CurrentWeather, Location } from '../../interfaces/Weather';
@@ -14,8 +14,11 @@ export default function WeatherCard({ current, location }: WeatherCardProps) {
     const iconName = getWeatherIconName(current.weatherCode);
     const description = getWeatherDescription(current.weatherCode);
 
+    const CardWrapper = Platform.OS === 'web' ? View : BlurView;
+    const cardProps = Platform.OS === 'web' ? {} : { intensity: 30, tint: 'light' as const };
+
     return (
-        <BlurView intensity={30} tint="light" style={styles.card}>
+        <CardWrapper {...cardProps} style={styles.card}>
             <Text style={styles.locationText}>
                 {location.name}
                 {location.admin1 ? ` • ${location.admin1}` : ''}
@@ -49,7 +52,7 @@ export default function WeatherCard({ current, location }: WeatherCardProps) {
                     </View>
                 </View>
             </View>
-        </BlurView>
+        </CardWrapper>
     );
 }
 

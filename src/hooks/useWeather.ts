@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Platform } from 'react-native';
 import * as Location from 'expo-location';
 import { WeatherService } from '../services/weatherService';
 import { WeatherData } from '../interfaces/Weather';
@@ -59,17 +60,25 @@ const fetchWeatherByQuery = async (query: string) => {
             let location = await Location.getCurrentPositionAsync({});
             const { latitude, longitude } = location.coords;
 
-            // We need to reverse geocode or at least get weather by lat/lon
-            // We can use Expo Location reverseGeocodeAsync for a nice name
-            let reverseGeo = await Location.reverseGeocodeAsync({ latitude, longitude });
-            let locationName = 'Unknown Location';
-            let admin1 = undefined;
-            let country = undefined;
+            let locationName = 'Current Location';
+            let admin1: string | undefined;
+            let country: string | undefined;
 
-            if (reverseGeo && reverseGeo.length > 0) {
-                locationName = reverseGeo[0].city || reverseGeo[0].region || 'Current Location';
-                admin1 = reverseGeo[0].region || undefined;
-                country = reverseGeo[0].country || undefined;
+            if (Platform.OS === 'web') {
+                try {
+                    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`);
+                    const geo = await res.json();
+                    locationName = geo.address?.city || geo.address?.town || geo.address?.village || geo.address?.county || 'Current Location';
+                    admin1 = geo.address?.state || undefined;
+                    country = geo.address?.country || undefined;
+                } catch {}
+            } else {
+                const reverseGeo = await Location.reverseGeocodeAsync({ latitude, longitude });
+                if (reverseGeo && reverseGeo.length > 0) {
+                    locationName = reverseGeo[0].city || reverseGeo[0].region || 'Current Location';
+                    admin1 = reverseGeo[0].region || undefined;
+                    country = reverseGeo[0].country || undefined;
+                }
             }
 
             const result = await WeatherService.getWeather(latitude, longitude, {

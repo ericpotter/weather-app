@@ -43,11 +43,8 @@
         "projectId": "a2c34ec1-887c-4a0a-a67a-998b4bf6e877"
       }
     },
-    "runtimeVersion": {
-      "policy": "sdkVersion"
-    },
     "updates": {
-      "url": "https://u.expo.dev/a2c34ec1-887c-4a0a-a67a-998b4bf6e877"
+      "fallbackToCacheTimeout": 0
     }
   }
 }

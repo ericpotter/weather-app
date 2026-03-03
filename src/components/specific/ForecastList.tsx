@@ -199,7 +199,8 @@ const styles = StyleSheet.create({
         marginBottom: 24,
     },
     detailTile: {
-        width: '47%',
+        flex: 1,
+        minWidth: '47%',
         backgroundColor: 'rgba(255,255,255,0.08)',
         borderRadius: 16,
         padding: 14,

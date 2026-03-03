@@ -37,12 +37,17 @@ export default function WeatherDetails({ current }: { current: CurrentWeather })
         { icon: 'water', label: 'Precipitation', value: `${current.precipitation} mm` },
     ];
 
+    const rows = [];
+    for (let i = 0; i < stats.length; i += 2) rows.push(stats.slice(i, i + 2));
+
     return (
         <View style={styles.container}>
             <Text style={styles.sectionTitle}>Weather Details</Text>
-            <View style={styles.grid}>
-                {stats.map((s, i) => <StatTile key={i} {...s} />)}
-            </View>
+            {rows.map((row, ri) => (
+                <View key={ri} style={styles.row}>
+                    {row.map((s, i) => <StatTile key={i} {...s} />)}
+                </View>
+            ))}
         </View>
     );
 }
@@ -60,13 +65,13 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
         marginBottom: 12,
     },
-    grid: {
+    row: {
         flexDirection: 'row',
-        flexWrap: 'wrap',
         gap: 10,
+        marginBottom: 10,
     },
     tile: {
-        width: '47%',
+        flex: 1,
         borderRadius: 20,
         overflow: 'hidden',
         padding: 18,
