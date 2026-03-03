@@ -31,7 +31,9 @@
       "themeColor": "#0F2027",
       "backgroundColor": "#0F2027",
       "display": "standalone",
-      "orientation": "portrait",
+      "orientation": "portrait"
+    },
+    "experiments": {
       "baseUrl": "/weather-app"
     },
     "plugins": [
