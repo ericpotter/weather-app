@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, ActivityIndicator, Alert, Platform } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Paths, writeAsStringAsync } from 'expo-file-system';
-import * as Sharing from 'expo-sharing';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { DBService, WeatherRecord } from '../services/dbService';
@@ -36,48 +34,57 @@ export default function HistoryScreen() {
     }, []);
 
     const exportData = async () => {
-        try {
-            if (records.length === 0) {
-                Alert.alert('No Data', 'There is no data to export.');
-                return;
-            }
-            const jsonData = JSON.stringify(records, null, 2);
+        if (records.length === 0) {
+            Alert.alert('No Data', 'There is no data to export.');
+            return;
+        }
+        const jsonData = JSON.stringify(records, null, 2);
 
-            // Using the modern Paths class from expo-file-system
-            const documentDir = Paths.document;
-            if (!documentDir) {
-                Alert.alert('Export Error', 'Cannot access device file system.');
-                return;
+        if (Platform.OS === 'web') {
+            const blob = new Blob([jsonData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'weather_history.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        } else {
+            try {
+                const { Paths, writeAsStringAsync } = await import('expo-file-system');
+                const Sharing = await import('expo-sharing');
+                const documentDir = Paths.document;
+                const file = documentDir.createFile('weather_history_export.json', 'application/json');
+                await writeAsStringAsync(file.uri, jsonData, { encoding: 'utf8' });
+                const isAvailable = await Sharing.isAvailableAsync();
+                if (isAvailable) {
+                    await Sharing.shareAsync(file.uri);
+                }
+            } catch (error) {
+                Alert.alert('Export Error', 'Failed to export data.');
             }
-
-            const file = documentDir.createFile('weather_history_export.json', 'application/json');
-            await writeAsStringAsync(file.uri, jsonData, { encoding: 'utf8' });
-
-            const isAvailable = await Sharing.isAvailableAsync();
-            if (isAvailable) {
-                await Sharing.shareAsync(file.uri);
-            } else {
-                Alert.alert('Export Successful', 'Data saved but sharing is not available on this device.');
-            }
-        } catch (error) {
-            Alert.alert('Export Error', 'Failed to export data.');
         }
     };
 
     const handleDelete = async (id: string) => {
-        Alert.alert('Delete Record', 'Are you sure you want to permanently delete this weather log?', [
-            { text: 'Cancel', style: 'cancel' },
-            {
-                text: 'Delete', style: 'destructive', onPress: async () => {
-                    try {
-                        await DBService.deleteQuery(id);
-                        setRecords(records.filter(r => r.id !== id));
-                    } catch (error) {
-                        Alert.alert('Error', 'Failed to delete record');
-                    }
-                }
+        const doDelete = async () => {
+            try {
+                await DBService.deleteQuery(id);
+                setRecords(prev => prev.filter(r => r.id !== id));
+            } catch (error) {
+                Alert.alert('Error', 'Failed to delete record');
             }
-        ]);
+        };
+
+        if (Platform.OS === 'web') {
+            if (window.confirm('Are you sure you want to delete this record?')) {
+                await doDelete();
+            }
+        } else {
+            Alert.alert('Delete Record', 'Are you sure you want to permanently delete this weather log?', [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Delete', style: 'destructive', onPress: doDelete }
+            ]);
+        }
     };
 
     const startEdit = (record: WeatherRecord) => {
