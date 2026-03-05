@@ -1,15 +1,15 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { CurrentWeather, Location } from '../../interfaces/Weather';
-import { getWeatherDescription, getWeatherIconName } from '../../utils/weatherIcons';
+import {StyleSheet, Text, View} from 'react-native';
+import {MaterialCommunityIcons} from '@expo/vector-icons';
+import {CurrentWeather, Location} from '../../interfaces/Weather';
+import {getWeatherDescription, getWeatherIconName} from '../../utils/weatherIcons';
 
 interface WeatherCardProps {
     current: CurrentWeather;
     location: Location;
 }
 
-export default function WeatherCard({ current, location }: WeatherCardProps) {
+export default function WeatherCard({current, location}: WeatherCardProps) {
     const iconName = getWeatherIconName(current.weatherCode);
     const description = getWeatherDescription(current.weatherCode);
 
@@ -21,7 +21,7 @@ export default function WeatherCard({ current, location }: WeatherCardProps) {
             </Text>
 
             <View style={styles.mainInfo}>
-                <MaterialCommunityIcons name={iconName} size={120} color="#FFFFFF" style={styles.shadowIcon} />
+                <MaterialCommunityIcons name={iconName} size={120} color="#FFFFFF" style={styles.shadowIcon}/>
                 <View style={styles.tempContainer}>
                     <Text style={styles.temperature}>{Math.round(current.temperature)}</Text>
                     <Text style={styles.degreeSymbol}>°C</Text>
@@ -30,18 +30,18 @@ export default function WeatherCard({ current, location }: WeatherCardProps) {
 
             <Text style={styles.descriptionText}>{description}</Text>
 
-            <View style={styles.divider} />
+            <View style={styles.divider}/>
 
             <View style={styles.detailsRow}>
                 <View style={styles.detailItem}>
-                    <MaterialCommunityIcons name="water-percent" size={28} color="rgba(255,255,255,0.7)" />
+                    <MaterialCommunityIcons name="water-percent" size={28} color="rgba(255,255,255,0.7)"/>
                     <View>
                         <Text style={styles.detailLabel}>Humidity</Text>
                         <Text style={styles.detailValue}>{current.humidity}%</Text>
                     </View>
                 </View>
                 <View style={styles.detailItem}>
-                    <MaterialCommunityIcons name="weather-windy" size={28} color="rgba(255,255,255,0.7)" />
+                    <MaterialCommunityIcons name="weather-windy" size={28} color="rgba(255,255,255,0.7)"/>
                     <View>
                         <Text style={styles.detailLabel}>Wind</Text>
                         <Text style={styles.detailValue}>{current.windSpeed} km/h</Text>
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     },
     shadowIcon: {
         shadowColor: '#FFFFFF',
-        shadowOffset: { width: 0, height: 0 },
+        shadowOffset: {width: 0, height: 0},
         shadowOpacity: 0.4,
         shadowRadius: 20,
         marginBottom: 16,

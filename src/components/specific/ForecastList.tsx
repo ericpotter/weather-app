@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
-import { DailyForecast } from '../../interfaces/Weather';
-import { getWeatherDescription, getWeatherIconName } from '../../utils/weatherIcons';
-import { format, parseISO } from 'date-fns';
+import React, {useState} from 'react';
+import {Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {MaterialCommunityIcons} from '@expo/vector-icons';
+import {BlurView} from 'expo-blur';
+import {DailyForecast} from '../../interfaces/Weather';
+import {getWeatherDescription, getWeatherIconName} from '../../utils/weatherIcons';
+import {format, parseISO} from 'date-fns';
 
 function windDegToCompass(deg: number): string {
     const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
@@ -23,7 +23,7 @@ interface ForecastListProps {
     forecast: DailyForecast[];
 }
 
-export default function ForecastList({ forecast }: ForecastListProps) {
+export default function ForecastList({forecast}: ForecastListProps) {
     const [selected, setSelected] = useState<DailyForecast | null>(null);
 
     return (
@@ -42,7 +42,7 @@ export default function ForecastList({ forecast }: ForecastListProps) {
                                 <Text style={styles.dayName}>{dayName}</Text>
                                 <Text style={styles.dateText}>{dateStr}</Text>
                                 <View style={styles.iconContainer}>
-                                    <MaterialCommunityIcons name={iconName} size={42} color="#FFFFFF" />
+                                    <MaterialCommunityIcons name={iconName} size={42} color="#FFFFFF"/>
                                 </View>
                                 <View style={styles.temps}>
                                     <Text style={styles.maxTemp}>{Math.round(day.maxTemp)}°</Text>
@@ -83,7 +83,7 @@ export default function ForecastList({ forecast }: ForecastListProps) {
                                     <Text style={styles.tempBlockLabel}>High</Text>
                                     <Text style={styles.tempBlockValue}>{Math.round(selected.maxTemp)}°C</Text>
                                 </View>
-                                <View style={styles.tempDivider} />
+                                <View style={styles.tempDivider}/>
                                 <View style={styles.tempBlock}>
                                     <Text style={styles.tempBlockLabel}>Low</Text>
                                     <Text style={styles.tempBlockValue}>{Math.round(selected.minTemp)}°C</Text>
@@ -92,17 +92,42 @@ export default function ForecastList({ forecast }: ForecastListProps) {
 
                             <View style={styles.detailGrid}>
                                 {[
-                                    { icon: 'weather-rainy', label: 'Precipitation', value: `${selected.precipitationSum} mm` },
-                                    { icon: 'water-percent', label: 'Rain Chance', value: `${selected.precipitationProbability}%` },
-                                    { icon: 'weather-windy', label: 'Max Wind', value: `${Math.round(selected.windSpeedMax)} km/h` },
-                                    { icon: 'weather-hurricane', label: 'Wind Gusts', value: `${Math.round(selected.windGustsMax)} km/h` },
-                                    { icon: 'compass-outline', label: 'Wind Dir', value: windDegToCompass(selected.windDirection) },
-                                    { icon: 'white-balance-sunny', label: 'UV Index', value: `${Math.round(selected.uvIndexMax)}` },
-                                    { icon: 'weather-sunset-up', label: 'Sunrise', value: formatTime(selected.sunrise) },
-                                    { icon: 'weather-sunset-down', label: 'Sunset', value: formatTime(selected.sunset) },
+                                    {
+                                        icon: 'weather-rainy',
+                                        label: 'Precipitation',
+                                        value: `${selected.precipitationSum} mm`
+                                    },
+                                    {
+                                        icon: 'water-percent',
+                                        label: 'Rain Chance',
+                                        value: `${selected.precipitationProbability}%`
+                                    },
+                                    {
+                                        icon: 'weather-windy',
+                                        label: 'Max Wind',
+                                        value: `${Math.round(selected.windSpeedMax)} km/h`
+                                    },
+                                    {
+                                        icon: 'weather-hurricane',
+                                        label: 'Wind Gusts',
+                                        value: `${Math.round(selected.windGustsMax)} km/h`
+                                    },
+                                    {
+                                        icon: 'compass-outline',
+                                        label: 'Wind Dir',
+                                        value: windDegToCompass(selected.windDirection)
+                                    },
+                                    {
+                                        icon: 'white-balance-sunny',
+                                        label: 'UV Index',
+                                        value: `${Math.round(selected.uvIndexMax)}`
+                                    },
+                                    {icon: 'weather-sunset-up', label: 'Sunrise', value: formatTime(selected.sunrise)},
+                                    {icon: 'weather-sunset-down', label: 'Sunset', value: formatTime(selected.sunset)},
                                 ].map((item, i) => (
                                     <View key={i} style={styles.detailTile}>
-                                        <MaterialCommunityIcons name={item.icon as any} size={20} color="rgba(255,255,255,0.7)" />
+                                        <MaterialCommunityIcons name={item.icon as any} size={20}
+                                                                color="rgba(255,255,255,0.7)"/>
                                         <Text style={styles.detailValue}>{item.value}</Text>
                                         <Text style={styles.detailLabel}>{item.label}</Text>
                                     </View>
@@ -121,7 +146,7 @@ export default function ForecastList({ forecast }: ForecastListProps) {
 }
 
 const styles = StyleSheet.create({
-    container: { marginVertical: 16 },
+    container: {marginVertical: 16},
     title: {
         fontSize: 20,
         fontWeight: '700',
@@ -130,7 +155,7 @@ const styles = StyleSheet.create({
         marginBottom: 16,
         letterSpacing: 0.5,
     },
-    scrollContent: { paddingHorizontal: 20, gap: 16 },
+    scrollContent: {paddingHorizontal: 20, gap: 16},
     card: {
         borderRadius: 24,
         padding: 20,
@@ -141,12 +166,12 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255,255,255,0.05)',
         overflow: 'hidden',
     },
-    dayName: { fontSize: 16, fontWeight: '700', color: '#FFFFFF', marginBottom: 4 },
-    dateText: { fontSize: 13, color: 'rgba(255,255,255,0.6)', marginBottom: 16, fontWeight: '500' },
-    iconContainer: { marginBottom: 16 },
-    temps: { alignItems: 'center', gap: 4 },
-    maxTemp: { fontSize: 18, fontWeight: 'bold', color: '#FFFFFF' },
-    minTemp: { fontSize: 14, color: 'rgba(255,255,255,0.5)', fontWeight: '600' },
+    dayName: {fontSize: 16, fontWeight: '700', color: '#FFFFFF', marginBottom: 4},
+    dateText: {fontSize: 13, color: 'rgba(255,255,255,0.6)', marginBottom: 16, fontWeight: '500'},
+    iconContainer: {marginBottom: 16},
+    temps: {alignItems: 'center', gap: 4},
+    maxTemp: {fontSize: 18, fontWeight: 'bold', color: '#FFFFFF'},
+    minTemp: {fontSize: 14, color: 'rgba(255,255,255,0.5)', fontWeight: '600'},
 
     // Modal
     modalOverlay: {
@@ -169,8 +194,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 8,
     },
-    modalDay: { fontSize: 26, fontWeight: '800', color: '#FFFFFF' },
-    modalDate: { fontSize: 14, color: 'rgba(255,255,255,0.5)', marginTop: 2 },
+    modalDay: {fontSize: 26, fontWeight: '800', color: '#FFFFFF'},
+    modalDate: {fontSize: 14, color: 'rgba(255,255,255,0.5)', marginTop: 2},
     modalDescription: {
         fontSize: 16,
         color: 'rgba(255,255,255,0.7)',
@@ -188,10 +213,16 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.1)',
     },
-    tempBlock: { flex: 1, alignItems: 'center' },
-    tempBlockLabel: { fontSize: 12, color: 'rgba(255,255,255,0.5)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1 },
-    tempBlockValue: { fontSize: 36, fontWeight: '300', color: '#FFFFFF', marginTop: 4 },
-    tempDivider: { width: 1, height: 50, backgroundColor: 'rgba(255,255,255,0.15)' },
+    tempBlock: {flex: 1, alignItems: 'center'},
+    tempBlockLabel: {
+        fontSize: 12,
+        color: 'rgba(255,255,255,0.5)',
+        fontWeight: '600',
+        textTransform: 'uppercase',
+        letterSpacing: 1
+    },
+    tempBlockValue: {fontSize: 36, fontWeight: '300', color: '#FFFFFF', marginTop: 4},
+    tempDivider: {width: 1, height: 50, backgroundColor: 'rgba(255,255,255,0.15)'},
     detailGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
@@ -208,8 +239,14 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.12)',
         gap: 4,
     },
-    detailValue: { fontSize: 18, fontWeight: '700', color: '#FFFFFF', marginTop: 4 },
-    detailLabel: { fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5 },
+    detailValue: {fontSize: 18, fontWeight: '700', color: '#FFFFFF', marginTop: 4},
+    detailLabel: {
+        fontSize: 11,
+        color: 'rgba(255,255,255,0.5)',
+        fontWeight: '600',
+        textTransform: 'uppercase',
+        letterSpacing: 0.5
+    },
     closeBtn: {
         alignItems: 'center',
         padding: 16,
@@ -218,5 +255,5 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.15)',
     },
-    closeBtnText: { color: '#FFFFFF', fontWeight: '600', fontSize: 16 },
+    closeBtnText: {color: '#FFFFFF', fontWeight: '600', fontSize: 16},
 });

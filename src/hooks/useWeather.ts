@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { Platform } from 'react-native';
+import {useState} from 'react';
+import {Platform} from 'react-native';
 import * as Location from 'expo-location';
-import { WeatherService } from '../services/weatherService';
-import { WeatherData } from '../interfaces/Weather';
+import {WeatherService} from '../services/weatherService';
+import {WeatherData} from '../interfaces/Weather';
 
 export function useWeather() {
     const [data, setData] = useState<WeatherData | null>(null);
@@ -10,7 +10,7 @@ export function useWeather() {
     const [error, setError] = useState<string | null>(null);
     const [locationOptions, setLocationOptions] = useState<import('../interfaces/Weather').Location[] | null>(null);
 
-const fetchWeatherByQuery = async (query: string) => {
+    const fetchWeatherByQuery = async (query: string) => {
         setLoading(true);
         setError(null);
         setLocationOptions(null);
@@ -52,13 +52,13 @@ const fetchWeatherByQuery = async (query: string) => {
         setLoading(true);
         setError(null);
         try {
-            let { status } = await Location.requestForegroundPermissionsAsync();
+            let {status} = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
                 throw new Error('Permission to access location was denied');
             }
 
             let location = await Location.getCurrentPositionAsync({});
-            const { latitude, longitude } = location.coords;
+            const {latitude, longitude} = location.coords;
 
             let locationName = 'Current Location';
             let admin1: string | undefined;
@@ -71,9 +71,10 @@ const fetchWeatherByQuery = async (query: string) => {
                     locationName = geo.address?.city || geo.address?.town || geo.address?.village || geo.address?.county || 'Current Location';
                     admin1 = geo.address?.state || undefined;
                     country = geo.address?.country || undefined;
-                } catch {}
+                } catch {
+                }
             } else {
-                const reverseGeo = await Location.reverseGeocodeAsync({ latitude, longitude });
+                const reverseGeo = await Location.reverseGeocodeAsync({latitude, longitude});
                 if (reverseGeo && reverseGeo.length > 0) {
                     locationName = reverseGeo[0].city || reverseGeo[0].region || 'Current Location';
                     admin1 = reverseGeo[0].region || undefined;

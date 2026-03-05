@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
-import { CurrentWeather } from '../../interfaces/Weather';
+import {StyleSheet, Text, View} from 'react-native';
+import {MaterialCommunityIcons} from '@expo/vector-icons';
+import {BlurView} from 'expo-blur';
+import {CurrentWeather} from '../../interfaces/Weather';
 
 function windDegToCompass(deg: number): string {
     const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
@@ -15,26 +15,26 @@ interface StatProps {
     value: string;
 }
 
-function StatTile({ icon, label, value }: StatProps) {
+function StatTile({icon, label, value}: StatProps) {
     return (
         <BlurView intensity={25} tint="light" style={styles.tile}>
-            <MaterialCommunityIcons name={icon as any} size={24} color="rgba(255,255,255,0.9)" />
+            <MaterialCommunityIcons name={icon as any} size={24} color="rgba(255,255,255,0.9)"/>
             <Text style={styles.tileValue}>{value}</Text>
             <Text style={styles.tileLabel}>{label}</Text>
         </BlurView>
     );
 }
 
-export default function WeatherDetails({ current }: { current: CurrentWeather }) {
+export default function WeatherDetails({current}: { current: CurrentWeather }) {
     const stats: StatProps[] = [
-        { icon: 'thermometer', label: 'Feels Like', value: `${Math.round(current.feelsLike)}°C` },
-        { icon: 'weather-windy', label: 'Wind Gusts', value: `${Math.round(current.windGusts)} km/h` },
-        { icon: 'compass-outline', label: 'Wind Dir', value: windDegToCompass(current.windDirection) },
-        { icon: 'white-balance-sunny', label: 'UV Index', value: `${Math.round(current.uvIndex)}` },
-        { icon: 'eye-outline', label: 'Visibility', value: `${(current.visibility / 1000).toFixed(1)} km` },
-        { icon: 'gauge', label: 'Pressure', value: `${Math.round(current.pressure)} hPa` },
-        { icon: 'cloud-outline', label: 'Cloud Cover', value: `${current.cloudCover}%` },
-        { icon: 'water', label: 'Precipitation', value: `${current.precipitation} mm` },
+        {icon: 'thermometer', label: 'Feels Like', value: `${Math.round(current.feelsLike)}°C`},
+        {icon: 'weather-windy', label: 'Wind Gusts', value: `${Math.round(current.windGusts)} km/h`},
+        {icon: 'compass-outline', label: 'Wind Dir', value: windDegToCompass(current.windDirection)},
+        {icon: 'white-balance-sunny', label: 'UV Index', value: `${Math.round(current.uvIndex)}`},
+        {icon: 'eye-outline', label: 'Visibility', value: `${(current.visibility / 1000).toFixed(1)} km`},
+        {icon: 'gauge', label: 'Pressure', value: `${Math.round(current.pressure)} hPa`},
+        {icon: 'cloud-outline', label: 'Cloud Cover', value: `${current.cloudCover}%`},
+        {icon: 'water', label: 'Precipitation', value: `${current.precipitation} mm`},
     ];
 
     const rows = [];

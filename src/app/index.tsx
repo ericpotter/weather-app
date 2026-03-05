@@ -1,17 +1,29 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, Text, TouchableOpacity, Alert, StatusBar, Modal, Linking } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useWeather } from '../hooks/useWeather';
+import React, {useEffect, useState} from 'react';
+import {
+    ActivityIndicator,
+    Alert,
+    Linking,
+    Modal,
+    SafeAreaView,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
+} from 'react-native';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator, NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {useWeather} from '../hooks/useWeather';
 import SearchBar from '../components/specific/SearchBar';
 import WeatherCard from '../components/specific/WeatherCard';
 import ForecastList from '../components/specific/ForecastList';
-import { DBService } from '../services/dbService';
-import { auth } from '../services/firebaseConfig';
+import {DBService} from '../services/dbService';
+import {auth} from '../services/firebaseConfig';
 import HistoryScreen from './history';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
+import {MaterialCommunityIcons} from '@expo/vector-icons';
+import {LinearGradient} from 'expo-linear-gradient';
+import {BlurView} from 'expo-blur';
 import WeatherEffects from '../components/specific/WeatherEffects';
 import WeatherDetails from '../components/specific/WeatherDetails';
 
@@ -40,8 +52,16 @@ interface Props {
     navigation: HomeScreenNavigationProp;
 }
 
-function HomeScreen({ navigation }: Props) {
-    const { data, loading, error, locationOptions, fetchWeatherByQuery, selectLocation, fetchWeatherByCurrentLocation } = useWeather();
+function HomeScreen({navigation}: Props) {
+    const {
+        data,
+        loading,
+        error,
+        locationOptions,
+        fetchWeatherByQuery,
+        selectLocation,
+        fetchWeatherByCurrentLocation
+    } = useWeather();
     const [saving, setSaving] = useState(false);
     const [showAbout, setShowAbout] = useState(false);
 
@@ -80,48 +100,56 @@ function HomeScreen({ navigation }: Props) {
             colors={getWeatherGradient(data?.current.weatherCode)}
             style={styles.container}
         >
-            <WeatherEffects key={data?.current.weatherCode} weatherCode={data?.current.weatherCode} />
-            <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
+            <WeatherEffects key={data?.current.weatherCode} weatherCode={data?.current.weatherCode}/>
+            <StatusBar barStyle="light-content" translucent backgroundColor="transparent"/>
             <SafeAreaView style={styles.safeArea}>
                 <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                     <View style={styles.header}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                            <MaterialCommunityIcons name="weather-partly-cloudy" size={28} color="#FFFFFF" />
+                        <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
+                            <MaterialCommunityIcons name="weather-partly-cloudy" size={28} color="#FFFFFF"/>
                             <Text style={styles.logo}>Weather</Text>
                         </View>
-                        <View style={{ flexDirection: 'row', gap: 10 }}>
+                        <View style={{flexDirection: 'row', gap: 10}}>
                             <TouchableOpacity onPress={() => setShowAbout(true)} style={styles.historyBtn}>
                                 <BlurView intensity={30} tint="light" style={styles.historyGlass}>
-                                    <MaterialCommunityIcons name="information-outline" size={24} color="#FFFFFF" />
+                                    <MaterialCommunityIcons name="information-outline" size={24} color="#FFFFFF"/>
                                 </BlurView>
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => navigation.navigate('History')} style={styles.historyBtn}>
                                 <BlurView intensity={30} tint="light" style={styles.historyGlass}>
-                                    <MaterialCommunityIcons name="history" size={24} color="#FFFFFF" />
+                                    <MaterialCommunityIcons name="history" size={24} color="#FFFFFF"/>
                                 </BlurView>
                             </TouchableOpacity>
                         </View>
                     </View>
 
-                    <Modal visible={showAbout} transparent animationType="fade" onRequestClose={() => setShowAbout(false)}>
+                    <Modal visible={showAbout} transparent animationType="fade"
+                           onRequestClose={() => setShowAbout(false)}>
                         <View style={styles.modalOverlay}>
                             <BlurView intensity={60} tint="dark" style={styles.modalCard}>
-                                <MaterialCommunityIcons name="weather-partly-cloudy" size={40} color="#FFFFFF" style={{ marginBottom: 8 }} />
+                                <MaterialCommunityIcons name="weather-partly-cloudy" size={40} color="#FFFFFF"
+                                                        style={{marginBottom: 8}}/>
                                 <Text style={styles.modalTitle}>Weather</Text>
                                 <Text style={styles.modalSubtitle}>Built by Tsung-Yueh (Eric) Lai</Text>
 
-                                <View style={styles.modalDivider} />
+                                <View style={styles.modalDivider}/>
 
                                 <Text style={styles.modalSectionTitle}>About PM Accelerator</Text>
                                 <Text style={styles.modalBody}>
-                                    Product Manager Accelerator is the fastest-growing Product Management professional development company in the industry. Led by Dr. Nancy Li, PM Accelerator boasts the most engaging alumni network, the highest success rate in landing top-tier PM offers, and is top-rated in the product management education space.{'\n\n'}PM Accelerator also provides seed investment to selected teams building high-impact products, helping them scale or apply to Y Combinator, and created the AI PM Bootcamp to help professionals become the next generation of AI Product Leaders.
+                                    Product Manager Accelerator is the fastest-growing Product Management professional
+                                    development company in the industry. Led by Dr. Nancy Li, PM Accelerator boasts the
+                                    most engaging alumni network, the highest success rate in landing top-tier PM
+                                    offers, and is top-rated in the product management education space.{'\n\n'}PM
+                                    Accelerator also provides seed investment to selected teams building high-impact
+                                    products, helping them scale or apply to Y Combinator, and created the AI PM
+                                    Bootcamp to help professionals become the next generation of AI Product Leaders.
                                 </Text>
 
                                 <TouchableOpacity
                                     style={styles.linkedInBtn}
                                     onPress={() => Linking.openURL('https://www.linkedin.com/school/pmaccelerator/')}
                                 >
-                                    <MaterialCommunityIcons name="linkedin" size={18} color="#FFFFFF" />
+                                    <MaterialCommunityIcons name="linkedin" size={18} color="#FFFFFF"/>
                                     <Text style={styles.linkedInBtnText}>View on LinkedIn</Text>
                                 </TouchableOpacity>
 
@@ -143,7 +171,8 @@ function HomeScreen({ navigation }: Props) {
                             <Text style={styles.pickerTitle}>Select a location:</Text>
                             {locationOptions.map((loc, i) => (
                                 <TouchableOpacity key={i} style={styles.pickerItem} onPress={() => selectLocation(loc)}>
-                                    <MaterialCommunityIcons name="map-marker-outline" size={18} color="rgba(255,255,255,0.7)" />
+                                    <MaterialCommunityIcons name="map-marker-outline" size={18}
+                                                            color="rgba(255,255,255,0.7)"/>
                                     <Text style={styles.pickerText}>
                                         {loc.name}{loc.admin1 ? `, ${loc.admin1}` : ''}{loc.country ? `, ${loc.country}` : ''}
                                     </Text>
@@ -154,23 +183,23 @@ function HomeScreen({ navigation }: Props) {
 
                     {loading && (
                         <View style={styles.centerContainer}>
-                            <ActivityIndicator size="large" color="#FFFFFF" />
+                            <ActivityIndicator size="large" color="#FFFFFF"/>
                             <Text style={styles.loadingText}>Fetching Atmosphere...</Text>
                         </View>
                     )}
 
                     {error && !loading && (
                         <BlurView intensity={40} tint="dark" style={styles.errorContainer}>
-                            <MaterialCommunityIcons name="alert-circle-outline" size={24} color="#EF4444" />
+                            <MaterialCommunityIcons name="alert-circle-outline" size={24} color="#EF4444"/>
                             <Text style={styles.errorText}>{error}</Text>
                         </BlurView>
                     )}
 
                     {data && !loading && !error && (
                         <View style={styles.resultsContainer}>
-                            <WeatherCard current={data.current} location={data.location} />
-                            <WeatherDetails current={data.current} />
-                            <ForecastList forecast={data.daily} />
+                            <WeatherCard current={data.current} location={data.location}/>
+                            <WeatherDetails current={data.current}/>
+                            <ForecastList forecast={data.daily}/>
 
                             <TouchableOpacity
                                 activeOpacity={0.8}
@@ -180,11 +209,12 @@ function HomeScreen({ navigation }: Props) {
                             >
                                 <LinearGradient
                                     colors={['#10B981', '#059669']}
-                                    start={{ x: 0, y: 0 }}
-                                    end={{ x: 1, y: 1 }}
+                                    start={{x: 0, y: 0}}
+                                    end={{x: 1, y: 1}}
                                     style={styles.saveBtn}
                                 >
-                                    <MaterialCommunityIcons name="cloud-check" size={24} color="#FFFFFF" style={{ marginRight: 8 }} />
+                                    <MaterialCommunityIcons name="cloud-check" size={24} color="#FFFFFF"
+                                                            style={{marginRight: 8}}/>
                                     <Text style={styles.saveBtnText}>
                                         {saving ? 'Saving...' : 'Save to History Logs'}
                                     </Text>
@@ -309,7 +339,7 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         overflow: 'hidden',
         shadowColor: '#10B981',
-        shadowOffset: { width: 0, height: 4 },
+        shadowOffset: {width: 0, height: 4},
         shadowOpacity: 0.3,
         shadowRadius: 12,
     },
@@ -424,14 +454,14 @@ export default function RootApp() {
                 <Stack.Screen
                     name="Home"
                     component={HomeScreen}
-                    options={{ headerShown: false }}
+                    options={{headerShown: false}}
                 />
                 <Stack.Screen
                     name="History"
                     component={HistoryScreen}
                     options={{
                         title: 'History',
-                        headerStyle: { backgroundColor: '#0F2027' },
+                        headerStyle: {backgroundColor: '#0F2027'},
                         headerTintColor: '#FFFFFF',
                         headerShadowVisible: false,
                     }}

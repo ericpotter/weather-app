@@ -1,6 +1,8 @@
 # Weather App
 
-A React Native weather application built with Expo. Search any location or use your current GPS position to get real-time weather conditions, a 5-day forecast, and a Wikipedia summary of the location. Search history is persisted in Firebase Firestore with full CRUD support and JSON export.
+A React Native weather application built with Expo. Search any location or use your current GPS position to get
+real-time weather conditions, a 5-day forecast, and a Wikipedia summary of the location. Search history is persisted in
+Firebase Firestore with full CRUD support and JSON export.
 
 ## Features
 
@@ -38,7 +40,8 @@ EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
 EXPO_PUBLIC_FIREBASE_APP_ID=
 ```
 
-You can place these in a `.env` file at the project root. Without them, the app runs but all Firestore operations will fail.
+You can place these in a `.env` file at the project root. Without them, the app runs but all Firestore operations will
+fail.
 
 3. Start the development server:
 

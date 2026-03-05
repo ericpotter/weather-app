@@ -1,5 +1,5 @@
-import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, where } from 'firebase/firestore';
-import { db } from './firebaseConfig';
+import {addDoc, collection, deleteDoc, doc, getDocs, orderBy, query, updateDoc, where} from 'firebase/firestore';
+import {db} from './firebaseConfig';
 
 export interface WeatherRecord {
     id?: string;
@@ -35,7 +35,7 @@ export const DBService = {
             const querySnapshot = await getDocs(q);
             const records: WeatherRecord[] = [];
             querySnapshot.forEach((doc) => {
-                records.push({ id: doc.id, ...doc.data() } as WeatherRecord);
+                records.push({id: doc.id, ...doc.data()} as WeatherRecord);
             });
             return records;
         } catch (error) {

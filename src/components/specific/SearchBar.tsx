@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
+import React, {useState} from 'react';
+import {StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {MaterialCommunityIcons} from '@expo/vector-icons';
+import {BlurView} from 'expo-blur';
 
 interface SearchBarProps {
     onSearch: (query: string) => void;
@@ -9,7 +9,7 @@ interface SearchBarProps {
     loading?: boolean;
 }
 
-export default function SearchBar({ onSearch, onLocationSearch, loading }: SearchBarProps) {
+export default function SearchBar({onSearch, onLocationSearch, loading}: SearchBarProps) {
     const [query, setQuery] = useState('');
 
     const handleSearch = () => {
@@ -22,7 +22,7 @@ export default function SearchBar({ onSearch, onLocationSearch, loading }: Searc
         <View style={styles.container}>
             <BlurView intensity={20} tint="light" style={styles.glassContainer}>
                 <View style={styles.inputRow}>
-                    <MaterialCommunityIcons name="magnify" size={24} color="rgba(255,255,255,0.7)" style={styles.icon} />
+                    <MaterialCommunityIcons name="magnify" size={24} color="rgba(255,255,255,0.7)" style={styles.icon}/>
                     <TextInput
                         style={styles.input}
                         placeholder="Search city, zip, landmark..."
@@ -35,7 +35,7 @@ export default function SearchBar({ onSearch, onLocationSearch, loading }: Searc
                     />
                     {query.length > 0 && (
                         <TouchableOpacity onPress={handleSearch} disabled={loading} style={styles.searchBtn}>
-                            <MaterialCommunityIcons name="arrow-right-circle" size={28} color="#FFFFFF" />
+                            <MaterialCommunityIcons name="arrow-right-circle" size={28} color="#FFFFFF"/>
                         </TouchableOpacity>
                     )}
                 </View>
@@ -47,7 +47,7 @@ export default function SearchBar({ onSearch, onLocationSearch, loading }: Searc
                 disabled={loading}
             >
                 <BlurView intensity={15} tint="light" style={styles.locationGlass}>
-                    <MaterialCommunityIcons name="crosshairs-gps" size={18} color="#FFFFFF" />
+                    <MaterialCommunityIcons name="crosshairs-gps" size={18} color="#FFFFFF"/>
                     <Text style={styles.locationButtonText}>Use Current Location</Text>
                 </BlurView>
             </TouchableOpacity>

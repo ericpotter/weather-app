@@ -1,5 +1,6 @@
 import {getApp, getApps, initializeApp} from 'firebase/app';
 import {getFirestore} from 'firebase/firestore';
+// @ts-ignore
 import {browserLocalPersistence, getAuth, getReactNativePersistence, initializeAuth} from 'firebase/auth';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import {Platform} from 'react-native';
@@ -24,7 +25,6 @@ if (!getApps().length) {
     app = getApp();
 }
 
-// Fallback just in case app fails to init
 export const db = app ? getFirestore(app) : getFirestore();
 
 const persistence = Platform.OS === 'web'

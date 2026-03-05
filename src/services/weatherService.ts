@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Location, WeatherData, CurrentWeather, DailyForecast } from '../interfaces/Weather';
+import {CurrentWeather, DailyForecast, Location, WeatherData} from '../interfaces/Weather';
 
 const GEO_API_URL = 'https://geocoding-api.open-meteo.com/v1/search';
 const WEATHER_API_URL = 'https://api.open-meteo.com/v1/forecast';

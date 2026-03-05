@@ -1,7 +1,7 @@
-import React, { useEffect, useRef } from 'react';
-import { Animated, Dimensions, StyleSheet, View } from 'react-native';
+import React, {useEffect, useRef} from 'react';
+import {Animated, Dimensions, StyleSheet, View} from 'react-native';
 
-const { width, height } = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 
 type EffectType = 'rain' | 'snow' | 'storm' | 'none';
 
@@ -16,11 +16,11 @@ function getEffectType(code: number | undefined): EffectType {
 const RAIN_COUNT = 30;
 const SNOW_COUNT = 20;
 
-export default function WeatherEffects({ weatherCode }: { weatherCode: number | undefined }) {
+export default function WeatherEffects({weatherCode}: { weatherCode: number | undefined }) {
     const effect = getEffectType(weatherCode);
 
     const rainParticles = useRef(
-        Array.from({ length: RAIN_COUNT }, () => ({
+        Array.from({length: RAIN_COUNT}, () => ({
             anim: new Animated.Value(0),
             x: Math.random() * width,
             delay: Math.random() * 1500,
@@ -30,7 +30,7 @@ export default function WeatherEffects({ weatherCode }: { weatherCode: number | 
     ).current;
 
     const snowParticles = useRef(
-        Array.from({ length: SNOW_COUNT }, () => ({
+        Array.from({length: SNOW_COUNT}, () => ({
             anim: new Animated.Value(0),
             x: Math.random() * width,
             drift: (Math.random() - 0.5) * 80,
@@ -51,8 +51,8 @@ export default function WeatherEffects({ weatherCode }: { weatherCode: number | 
                 const a = Animated.loop(
                     Animated.sequence([
                         Animated.delay(p.delay),
-                        Animated.timing(p.anim, { toValue: 1, duration: p.speed, useNativeDriver: true }),
-                        Animated.timing(p.anim, { toValue: 0, duration: 0, useNativeDriver: true }),
+                        Animated.timing(p.anim, {toValue: 1, duration: p.speed, useNativeDriver: true}),
+                        Animated.timing(p.anim, {toValue: 0, duration: 0, useNativeDriver: true}),
                     ])
                 );
                 a.start();
@@ -65,8 +65,8 @@ export default function WeatherEffects({ weatherCode }: { weatherCode: number | 
                 const a = Animated.loop(
                     Animated.sequence([
                         Animated.delay(p.delay),
-                        Animated.timing(p.anim, { toValue: 1, duration: p.speed, useNativeDriver: true }),
-                        Animated.timing(p.anim, { toValue: 0, duration: 0, useNativeDriver: true }),
+                        Animated.timing(p.anim, {toValue: 1, duration: p.speed, useNativeDriver: true}),
+                        Animated.timing(p.anim, {toValue: 0, duration: 0, useNativeDriver: true}),
                     ])
                 );
                 a.start();
@@ -78,10 +78,10 @@ export default function WeatherEffects({ weatherCode }: { weatherCode: number | 
         if (effect === 'storm') {
             const flash = () => {
                 Animated.sequence([
-                    Animated.timing(lightningOpacity, { toValue: 0.35, duration: 60, useNativeDriver: true }),
-                    Animated.timing(lightningOpacity, { toValue: 0, duration: 120, useNativeDriver: true }),
-                    Animated.timing(lightningOpacity, { toValue: 0.2, duration: 60, useNativeDriver: true }),
-                    Animated.timing(lightningOpacity, { toValue: 0, duration: 200, useNativeDriver: true }),
+                    Animated.timing(lightningOpacity, {toValue: 0.35, duration: 60, useNativeDriver: true}),
+                    Animated.timing(lightningOpacity, {toValue: 0, duration: 120, useNativeDriver: true}),
+                    Animated.timing(lightningOpacity, {toValue: 0.2, duration: 60, useNativeDriver: true}),
+                    Animated.timing(lightningOpacity, {toValue: 0, duration: 200, useNativeDriver: true}),
                 ]).start(() => {
                     lightningTimeout = setTimeout(flash, 2000 + Math.random() * 4000);
                 });
@@ -127,7 +127,7 @@ export default function WeatherEffects({ weatherCode }: { weatherCode: number | 
 
             {effect === 'storm' && (
                 <Animated.View
-                    style={[StyleSheet.absoluteFill, { backgroundColor: '#FFFFFF', opacity: lightningOpacity }]}
+                    style={[StyleSheet.absoluteFill, {backgroundColor: '#FFFFFF', opacity: lightningOpacity}]}
                 />
             )}
 
